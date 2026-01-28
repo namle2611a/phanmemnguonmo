@@ -9,13 +9,6 @@ Route::get('/', function () {
     return view('home');
 })->name('home');
 
-// Routes xác thực (Authentication)
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [AuthController::class, 'login']);
-Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
 
 // Gom nhóm Route Product
 Route::prefix('product')->group(function () {
@@ -62,6 +55,11 @@ Route::get('/sinhvien/{name?}/{mssv?}', function ($name = 'Luong Xuan Hieu', $ms
 Route::get('/banco/{n}', function ($n) {
     return view('banco', ['n' => $n]);
 });
+
+
+// 9. Route đăng ký tài khoản
+Route::get('/signin', [AuthController::class, 'SignIn'])->name('auth.signin');
+Route::post('/checksignin', [AuthController::class, 'CheckSignIn'])->name('auth.checksignin');
 
 
 // 8. Fallback Route: Xử lý lỗi 404 khi không tìm thấy route

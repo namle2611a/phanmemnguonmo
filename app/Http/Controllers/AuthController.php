@@ -2,94 +2,54 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
     /**
-     * Hiển thị form đăng nhập
+     * Hiển thị form đăng ký SignIn
      */
-    public function showLoginForm()
+    public function SignIn()
     {
-        return view('auth.login');
+        return view('auth.signin');
     }
 
     /**
-     * Xử lý đăng nhập
+     * Kiểm tra dữ liệu đăng ký từ form
      */
-    public function login(Request $request)
+    public function CheckSignIn(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|min:6',
-        ]);
+        // Lấy dữ liệu từ form
+        $username = $request->input('username');
+        $password = $request->input('password');
+        $repass = $request->input('repass');
+        $mssv = $request->input('mssv');
+        $lopmonhoc = $request->input('lopmonhoc');
+        $gioitinh = $request->input('gioitinh');
 
-        if (Auth::attempt($credentials, $request->filled('remember'))) {
-            $request->session()->regenerate();
-            return redirect()->intended('/')->with('success', 'Đăng nhập thành công!');
+        // Kiểm tra password và repass có khớp không
+        if ($password != $repass) {
+            return "Đăng ký thất bại";
         }
 
-        return back()->withErrors([
-            'email' => 'Email hoặc mật khẩu không đúng.',
-        ])->withInput($request->only('email'));
-    }
+        // Kiểm tra thông tin sinh viên làm bài (theo ví dụ: namlt, 123abc, 123abc, 26867, 67PM1, nam)
+        $validUsername = 'namlt';
+        $validPassword = '123abc';
+        $validMssv = '26867';
+        $validLopmonhoc = '67PM1';
+        $validGioitinh = 'nam';
 
-    /**
-     * Hiển thị form đăng ký
-     */
-    public function showRegisterForm()
-    {
-        return view('auth.register');
-    }
-
-    /**
-     * Xử lý đăng ký
-     */
-    public function register(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6|confirmed',
-        ], [
-            'name.required' => 'Vui lòng nhập tên của bạn.',
-            'email.required' => 'Vui lòng nhập email.',
-            'email.email' => 'Email không hợp lệ.',
-            'email.unique' => 'Email này đã được sử dụng.',
-            'password.required' => 'Vui lòng nhập mật khẩu.',
-            'password.min' => 'Mật khẩu phải có ít nhất 6 ký tự.',
-            'password.confirmed' => 'Mật khẩu xác nhận không khớp.',
-        ]);
-
-        if ($validator->fails()) {
-            return back()->withErrors($validator)->withInput();
+        // Kiểm tra từng trường thông tin
+        if ($username == $validUsername && 
+            $password == $validPassword && 
+            $mssv == $validMssv && 
+            $lopmonhoc == $validLopmonhoc && 
+            $gioitinh == $validGioitinh) {
+            return "Đăng ký thành công!";
         }
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        Auth::login($user);
-
-        return redirect('/')->with('success', 'Đăng ký thành công! Chào mừng bạn đến với website!');
-    }
-
-    /**
-     * Xử lý đăng xuất
-     */
-    public function logout(Request $request)
-    {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect('/')->with('success', 'Đăng xuất thành công!');
+        // Nếu thông tin không khớp
+        return "Đăng ký thất bại";
     }
 }
 
