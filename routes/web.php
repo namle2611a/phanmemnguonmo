@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AgeController;
 
 // 1. Route Home "/"
 Route::get('/', function () {
@@ -60,6 +61,17 @@ Route::get('/banco/{n}', function ($n) {
 // 9. Route đăng ký tài khoản
 Route::get('/signin', [AuthController::class, 'SignIn'])->name('auth.signin');
 Route::post('/checksignin', [AuthController::class, 'CheckSignIn'])->name('auth.checksignin');
+
+// 10. Route nhập tuổi
+Route::get('/age/input', [AgeController::class, 'input'])->name('age.input');
+Route::post('/age/store', [AgeController::class, 'store'])->name('age.store');
+
+// 11. Route được bảo vệ bởi middleware kiểm tra tuổi
+Route::middleware('check.age')->group(function () {
+    Route::get('/protected', function () {
+        return "Bạn đã được phép truy cập! Tuổi của bạn: " . session('age');
+    })->name('protected');
+});
 
 
 // 8. Fallback Route: Xử lý lỗi 404 khi không tìm thấy route
