@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AgeController;
+use App\Http\Controllers\CategoryController;
 
 // 1. Route Home "/"
 Route::get('/', function () {
@@ -71,6 +72,16 @@ Route::middleware('check.age')->group(function () {
     Route::get('/protected', function () {
         return "Bạn đã được phép truy cập! Tuổi của bạn: " . session('age');
     })->name('protected');
+});
+
+// 12. Route Category (Quản lý Danh mục)
+Route::prefix('category')->name('category.')->group(function () {
+    Route::get('/', [CategoryController::class, 'index'])->name('index');
+    Route::get('/create', [CategoryController::class, 'create'])->name('create');
+    Route::post('/', [CategoryController::class, 'store'])->name('store');
+    Route::get('/{id}/edit', [CategoryController::class, 'edit'])->name('edit');
+    Route::put('/{id}', [CategoryController::class, 'update'])->name('update');
+    Route::delete('/{id}', [CategoryController::class, 'destroy'])->name('destroy');
 });
 
 
